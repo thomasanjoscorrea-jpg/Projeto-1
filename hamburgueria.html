@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Burger Modelo – Cardápio Online</title>
+
+<!-- ============================================================
+     ESTILOS
+     ============================================================ -->
+<style>
+  :root {
+    --vermelho: #e0262c;
+    --escuro: #1c2733;
+    --cinza: #6b7785;
+    --borda: #e6e9ee;
+    --fundo: #f6f7f9;
+    --branco: #fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--fundo); color: var(--escuro); line-height: 1.35; padding-bottom: 90px; }
+  button, input { font: inherit; }
+  button { cursor: pointer; border: 0; }
+  .oculto { display: none !important; }
+
+  /* Capa e perfil */
+  .capa { height: 150px; background: linear-gradient(135deg, #111 0%, #3a1a14 55%, #8a2a14 100%); }
+  .perfil { text-align: center; margin-top: -48px; padding: 0 16px 14px; background: linear-gradient(to bottom, transparent 48px, var(--branco) 48px); }
+  .logo {
+    width: 96px; height: 96px; border-radius: 50%; border: 4px solid var(--branco);
+    background: var(--vermelho); color: var(--branco); font-size: 2.6rem;
+    display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,.25);
+  }
+  .perfil h1 { font-size: 1rem; margin-top: 8px; letter-spacing: .5px; }
+  .perfil .slogan { font-size: .8rem; color: var(--cinza); }
+
+  .conteudo { max-width: 900px; margin: 0 auto; background: var(--branco); }
+  .barra { display: flex; gap: 8px; padding: 10px 16px; flex-wrap: wrap; }
+  .busca { flex: 1 1 100%; display: flex; align-items: center; border: 1px solid var(--borda); border-radius: 6px; padding: 0 10px; }
+  .busca input { flex: 1; border: 0; padding: 10px 6px; outline: 0; font-size: .9rem; }
+  .btn-contorno {
+    flex: 1 1 140px; background: var(--branco); color: var(--vermelho); border: 1px solid var(--vermelho);
+    border-radius: 6px; padding: 9px 10px; font-size: .85rem;
+  }
+  .btn-contorno:hover { background: #fdecec; }
+
+  /* Abas */
+  .abas { position: sticky; top: 0; z-index: 20; display: flex; gap: 22px; overflow-x: auto; padding: 0 16px; background: var(--branco); border-bottom: 1px solid var(--borda); box-shadow: 0 4px 6px -6px rgba(0,0,0,.3); }
+  .aba { background: none; padding: 14px 2px; font-size: .8rem; color: var(--cinza); text-transform: uppercase; white-space: nowrap; border-bottom: 3px solid transparent; }
+  .aba.ativa { color: var(--vermelho); border-bottom-color: var(--vermelho); font-weight: 700; }
+
+  /* Produtos */
+  .secao { padding: 0 16px; scroll-margin-top: 56px; }
+  .secao h2 { font-size: 1rem; margin: 20px 0 12px; }
+  .secao h2::before { content: "›"; color: var(--vermelho); font-weight: 900; margin-right: 6px; }
+  .lista { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .lista { grid-template-columns: 1fr 1fr; } }
+  .produto {
+    background: var(--branco); border: 1px solid var(--borda); border-radius: 8px; padding: 14px;
+    display: flex; flex-direction: column; gap: 6px; text-align: left; width: 100%; transition: box-shadow .15s;
+  }
+  .produto:hover { box-shadow: 0 3px 12px rgba(0,0,0,.12); }
+  .produto .nome { font-weight: 700; font-size: .95rem; }
+  .produto .desc { font-size: .78rem; color: var(--cinza); text-transform: uppercase; flex: 1; }
+  .produto .rodape { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .produto .preco { font-weight: 800; color: var(--escuro); }
+  .produto .mais { background: var(--vermelho); color: var(--branco); width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; line-height: 1; }
+  .sem-resultado { padding: 30px 16px; text-align: center; color: var(--cinza); }
+
+  .rodape-loja { padding: 22px 16px; font-size: .8rem; color: var(--cinza); border-top: 1px solid var(--borda); margin-top: 24px; }
+
+  /* Barra do pedido (fixa embaixo) */
+  .barra-pedido {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px;
+    background: var(--branco); border-top: 1px solid var(--borda); box-shadow: 0 -4px 14px rgba(0,0,0,.1);
+  }
+  .barra-pedido button {
+    display: flex; justify-content: space-between; width: 100%; max-width: 900px; margin: 0 auto;
+    background: var(--vermelho); color: var(--branco); padding: 14px 18px; border-radius: 8px; font-weight: 700;
+  }
+
+  /* Painéis (modal inferior) */
+  .fundo { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
+  .painel { background: var(--branco); width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; border-radius: 16px 16px 0 0; padding: 20px; }
+  @media (min-width: 640px) { .fundo { align-items: center; } .painel { border-radius: 16px; } }
+  .painel h3 { margin-bottom: 12px; }
+  .painel .fechar { float: right; background: none; font-size: 1.6rem; color: var(--cinza); }
+  .linha { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--borda); }
+  .linha.sem-borda { border: 0; padding: 3px 0; }
+  .qtd { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .qtd button { width: 26px; height: 26px; border-radius: 50%; background: var(--fundo); border: 1px solid var(--borda); font-weight: 800; }
+  .total { font-size: 1.15rem; font-weight: 800; color: var(--vermelho); }
+  .campo { display: block; font-weight: 600; font-size: .85rem; margin-top: 10px; }
+  .campo input, .campo select { width: 100%; padding: 11px; margin-top: 4px; border: 1px solid var(--borda); border-radius: 6px; font: inherit; }
+  .campo input.erro { border-color: var(--vermelho); background: #fdecec; }
+  .btn-principal { width: 100%; background: var(--vermelho); color: var(--branco); padding: 14px; border-radius: 8px; font-weight: 700; margin-top: 14px; }
+  .btn-whats { background: #25d366; }
+  .msg-erro { color: var(--vermelho); font-weight: 600; min-height: 1.2em; margin-top: 8px; font-size: .85rem; }
+  .info p { margin: 6px 0; font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<div class="conteudo">
+  <div class="capa"></div>
+  <header class="perfil">
+    <div class="logo">🍔</div>
+    <h1 id="nome-loja"></h1>
+    <p class="slogan" id="slogan"></p>
+  </header>
+
+  <div class="barra">
+    <label class="busca"><span aria-hidden="true">🔍</span>
+      <input type="search" id="busca" placeholder="Pesquisar produtos por nome ou descrição">
+    </label>
+    <button class="btn-contorno" id="btn-pedidos">Meus Pedidos</button>
+    <button class="btn-contorno" id="btn-taxa">Taxa e Tempo de Entrega</button>
+  </div>
+
+  <nav class="abas" id="abas"></nav>
+  <main id="secoes"></main>
+
+  <footer class="rodape-loja" id="rodape-loja"></footer>
+</div>
+
+<!-- Barra fixa do pedido -->
+<div class="barra-pedido oculto" id="barra-pedido">
+  <button id="btn-ver-pedido"><span id="barra-qtd"></span><span>Ver pedido</span><span id="barra-total"></span></button>
+</div>
+
+<!-- Painel genérico -->
+<div class="fundo oculto" id="fundo">
+  <div class="painel" role="dialog" aria-modal="true">
+    <button class="fechar" id="btn-fechar" aria-label="Fechar">×</button>
+    <div id="painel-conteudo"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1) DADOS DA LOJA  ← EDITE AQUI
+   ============================================================ */
+// >>> ALTERE AQUI O NÚMERO DO WHATSAPP (55 + DDD + número, só dígitos) <<<
+const WHATSAPP_NUMERO = "5500000000000";
+
+const LOJA = {
+  nome: "BURGER MODELO",
+  slogan: "Artesanal de verdade",
+  telefone: "(00) 00000-0000",
+  endereco: "Rua Exemplo, 123 – Centro",
+  taxaEntrega: 5.00,
+  tempoEntrega: "40 a 60 minutos"
+};
+
+/* ============================================================
+   2) CARDÁPIO  ← EDITE AQUI (nomes, descrições e preços)
+   ============================================================ */
+const CARDAPIO = [
+  { categoria: "Hambúrguer Artesanal", itens: [
+    { nome: "Hambúrguer da Casa",  desc: "Pão brioche, blend 140g, cheddar, molho, alface", preco: 12.00 },
+    { nome: "Hambúrguer Duplo",    desc: "Pão brioche, 2 blends 140g, 2 cheddar, molho, alface", preco: 19.00 },
+    { nome: "Hambúrguer Triplo",   desc: "Pão brioche, 3 blends 140g, 3 cheddar, molho, alface", preco: 25.00 },
+    { nome: "Trio Artesanal",      desc: "Hambúrguer da casa, refrigerante lata e porção pequena de batata", preco: 21.00 },
+    { nome: "Dog no Molho",        desc: "Pão de leite, salsicha, milho, batata palha, queijo e molho", preco: 11.00 },
+    { nome: "Combo Família",       desc: "5 hambúrgueres, 1 batata grande com cheddar e bacon, 1 refrigerante 1,5L", preco: 85.00 }
+  ]},
+  { categoria: "Bebidas", itens: [
+    { nome: "Refrigerante Lata 310ml", desc: "Cola, guaraná ou laranja", preco: 6.00 },
+    { nome: "Refrigerante 2L",         desc: "Cola ou guaraná", preco: 14.00 },
+    { nome: "Suco de Uva Lata",        desc: "", preco: 8.00 },
+    { nome: "Água sem Gás 500ml",      desc: "", preco: 3.50 },
+    { nome: "Água com Gás 500ml",      desc: "", preco: 3.00 }
+  ]},
+  { categoria: "Batata Frita", itens: [
+    { nome: "Porção de Batata Frita",            desc: "Porção 400g", preco: 19.00 },
+    { nome: "Batata Frita Cheddar e Bacon",      desc: "Porção 400g", preco: 25.00 },
+    { nome: "Batata Frita Pequena",              desc: "Saquinho", preco: 6.00 }
+  ]}
+];
+
+/* ============================================================
+   3) ESTADO E UTILITÁRIOS
+   ============================================================ */
+let carrinho = {};   // { "nome do item": { nome, preco, qtd } }
+const $ = (id) => document.getElementById(id);
+const moeda = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const itensCarrinho = () => Object.values(carrinho);
+const subtotal = () => itensCarrinho().reduce((t, i) => t + i.preco * i.qtd, 0);
+const totalQtd = () => itensCarrinho().reduce((t, i) => t + i.qtd, 0);
+const slug = (s) => "cat-" + s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-");
+
+/* ============================================================
+   4) CARDÁPIO NA TELA
+   ============================================================ */
+function montarLoja() {
+  document.title = LOJA.nome + " – Cardápio Online";
+  $("nome-loja").textContent = LOJA.nome;
+  $("slogan").textContent = LOJA.slogan;
+  $("rodape-loja").innerHTML =
+    `<strong>${esc(LOJA.nome)}</strong><br>Telefone: ${esc(LOJA.telefone)}<br>Endereço: ${esc(LOJA.endereco)}`;
+
+  $("abas").innerHTML = CARDAPIO.map((c, i) =>
+    `<button class="aba ${i === 0 ? "ativa" : ""}" data-alvo="${slug(c.categoria)}">${esc(c.categoria)}</button>`).join("");
+  document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => {
+    $(b.dataset.alvo).scrollIntoView({ behavior: "smooth" });
+  }));
+  desenharProdutos("");
+}
+
+function desenharProdutos(filtro) {
+  const termo = filtro.trim().toLowerCase();
+  const html = CARDAPIO.map((cat) => {
+    const itens = cat.itens.filter((i) => !termo || (i.nome + " " + i.desc).toLowerCase().includes(termo));
+    if (!itens.length) return "";
+    return `<section class="secao" id="${slug(cat.categoria)}">
+      <h2>${esc(cat.categoria.toUpperCase())}</h2>
+      <div class="lista">${itens.map((i) =>
+        `<button class="produto" data-nome="${esc(i.nome)}">
+           <span class="nome">${esc(i.nome)}</span>
+           <span class="desc">${esc(i.desc)}</span>
+           <span class="rodape"><span class="preco">${moeda(i.preco)}</span><span class="mais" aria-hidden="true">+</span></span>
+         </button>`).join("")}</div>
+    </section>`;
+  }).join("");
+  $("secoes").innerHTML = html || '<p class="sem-resultado">Nenhum produto encontrado.</p>';
+  document.querySelectorAll(".produto").forEach((b) =>
+    b.addEventListener("click", () => adicionar(b.dataset.nome)));
+}
+
+function adicionar(nome) {
+  const item = CARDAPIO.flatMap((c) => c.itens).find((i) => i.nome === nome);
+  if (!item) return;
+  if (carrinho[nome]) carrinho[nome].qtd += 1;
+  else carrinho[nome] = { nome, preco: item.preco, qtd: 1 };
+  atualizarBarra();
+}
+
+function atualizarBarra() {
+  const q = totalQtd();
+  $("barra-pedido").classList.toggle("oculto", q === 0);
+  $("barra-qtd").textContent = q + (q === 1 ? " item" : " itens");
+  $("barra-total").textContent = moeda(subtotal());
+}
+
+// Destaca a aba da categoria visível
+window.addEventListener("scroll", () => {
+  let atual = CARDAPIO[0] && slug(CARDAPIO[0].categoria);
+  CARDAPIO.forEach((c) => {
+    const el = $(slug(c.categoria));
+    if (el && el.getBoundingClientRect().top < 120) atual = slug(c.categoria);
+  });
+  document.querySelectorAll(".aba").forEach((b) => b.classList.toggle("ativa", b.dataset.alvo === atual));
+});
+
+/* ============================================================
+   5) PAINÉIS: pedido, checkout, taxa, meus pedidos
+   ============================================================ */
+function abrirPainel(html) { $("painel-conteudo").innerHTML = html; $("fundo").classList.remove("oculto"); }
+function fecharPainel() { $("fundo").classList.add("oculto"); }
+
+function painelPedido() {
+  if (!itensCarrinho().length) return;
+  const linhas = itensCarrinho().map((i) =>
+    `<div class="linha"><div><strong>${esc(i.nome)}</strong><br>
+       <span class="qtd"><button data-acao="-" data-nome="${esc(i.nome)}">−</button><span>${i.qtd}</span><button data-acao="+" data-nome="${esc(i.nome)}">+</button></span></div>
+     <strong>${moeda(i.preco * i.qtd)}</strong></div>`).join("");
+  abrirPainel(`<h3>Seu pedido</h3>${linhas}
+    <div class="linha sem-borda"><span>Subtotal</span><span>${moeda(subtotal())}</span></div>
+    <div class="linha sem-borda"><span>Taxa de entrega</span><span>${moeda(LOJA.taxaEntrega)}</span></div>
+    <div class="linha sem-borda total"><span>Total</span><span>${moeda(subtotal() + LOJA.taxaEntrega)}</span></div>
+    <button class="btn-principal" id="btn-continuar">Continuar</button>`);
+  document.querySelectorAll("[data-acao]").forEach((b) => b.addEventListener("click", () => {
+    const it = carrinho[b.dataset.nome];
+    it.qtd += b.dataset.acao === "+" ? 1 : -1;
+    if (it.qtd <= 0) delete carrinho[b.dataset.nome];
+    atualizarBarra();
+    itensCarrinho().length ? painelPedido() : fecharPainel();
+  }));
+  $("btn-continuar").addEventListener("click", painelCheckout);
+}
+
+function painelCheckout() {
+  abrirPainel(`<h3>Entrega e pagamento</h3>
+    <form id="form" novalidate>
+      <label class="campo">Seu nome *<input id="f-nome" type="text"></label>
+      <label class="campo">Rua e número *<input id="f-rua" type="text"></label>
+      <label class="campo">Bairro *<input id="f-bairro" type="text"></label>
+      <label class="campo">Complemento / referência *<input id="f-comp" type="text"></label>
+      <label class="campo">Forma de pagamento *
+        <select id="f-pag"><option value="">Selecione</option><option>Cartão de Crédito</option><option>Cartão de Débito</option><option>Pix</option><option>Dinheiro</option></select>
+      </label>
+      <label class="campo oculto" id="bloco-troco">Troco para quanto? *<input id="f-troco" type="text" inputmode="decimal" placeholder="Ex.: 50"></label>
+      <p class="msg-erro" id="msg-erro" role="alert"></p>
+      <button class="btn-principal btn-whats" type="submit">Enviar pedido por WhatsApp</button>
+    </form>`);
+  $("f-pag").addEventListener("change", (e) =>
+    $("bloco-troco").classList.toggle("oculto", e.target.value !== "Dinheiro"));
+  $("form").addEventListener("submit", enviar);
+}
+
+function enviar(e) {
+  e.preventDefault();
+  const campos = [["f-nome", "Nome"], ["f-rua", "Rua e número"], ["f-bairro", "Bairro"], ["f-comp", "Complemento / referência"], ["f-pag", "Forma de pagamento"]];
+  if ($("f-pag").value === "Dinheiro") campos.push(["f-troco", "Troco"]);
+  let erro = "";
+  campos.forEach(([id, rotulo]) => {
+    const vazio = $(id).value.trim() === "";
+    $(id).classList.toggle("erro", vazio);
+    if (vazio && !erro) erro = `Preencha: ${rotulo}.`;
+  });
+  $("msg-erro").textContent = erro;
+  if (erro || !itensCarrinho().length) return;
+
+  const v = (id) => $(id).value.trim();
+  const itens = itensCarrinho().map((i) => `• ${i.qtd}x ${i.nome} - ${moeda(i.preco * i.qtd)}`).join("\n");
+  let msg = `*NOVO PEDIDO - ${LOJA.nome}*\n\nCliente: ${v("f-nome")}\n\n*Itens:*\n${itens}\n\n` +
+    `Subtotal: ${moeda(subtotal())}\nTaxa de entrega: ${moeda(LOJA.taxaEntrega)}\n*Total: ${moeda(subtotal() + LOJA.taxaEntrega)}*\n\n` +
+    `*Endereço:*\n${v("f-rua")}\nBairro: ${v("f-bairro")}\nComplemento: ${v("f-comp")}\n\n*Pagamento:* ${v("f-pag")}`;
+  if (v("f-pag") === "Dinheiro") msg += `\nTroco para: ${v("f-troco")}`;
+  window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+}
+
+function painelTaxa() {
+  abrirPainel(`<h3>Taxa e tempo de entrega</h3><div class="info">
+    <p><strong>Taxa fixa:</strong> ${moeda(LOJA.taxaEntrega)}</p>
+    <p><strong>Tempo estimado:</strong> ${esc(LOJA.tempoEntrega)}</p>
+    <p><strong>Endereço da loja:</strong> ${esc(LOJA.endereco)}</p></div>`);
+}
+
+function painelMeusPedidos() {
+  abrirPainel(`<h3>Meus pedidos</h3><div class="info"><p>Seus pedidos são enviados por WhatsApp.
+    Para acompanhar um pedido, fale com a loja pelo telefone ${esc(LOJA.telefone)}.</p></div>`);
+}
+
+/* ============================================================
+   6) EVENTOS E INICIALIZAÇÃO
+   ============================================================ */
+$("busca").addEventListener("input", (e) => desenharProdutos(e.target.value));
+$("btn-ver-pedido").addEventListener("click", painelPedido);
+$("btn-taxa").addEventListener("click", painelTaxa);
+$("btn-pedidos").addEventListener("click", painelMeusPedidos);
+$("btn-fechar").addEventListener("click", fecharPainel);
+$("fundo").addEventListener("click", (e) => { if (e.target === $("fundo")) fecharPainel(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharPainel(); });
+
+montarLoja();
+</script>
+</body>
+</html>
