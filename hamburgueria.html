@@ -1,143 +1,221 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Burger Modelo – Cardápio Online</title>
+<meta name="description" content="Cardápio online do Burger Modelo: hambúrgueres artesanais, bebidas e batatas. Monte seu pedido e envie pelo WhatsApp.">
+<meta name="theme-color" content="#e0262c">
+<meta property="og:title" content="Burger Modelo – Cardápio Online">
+<meta property="og:description" content="Hambúrgueres artesanais com entrega. Peça pelo WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="imagens/capa.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍔%3C/text%3E%3C/svg%3E">
+<link rel="preload" as="image" href="imagens/capa.jpg">
 
 <!-- ============================================================
      ESTILOS
+     As cores e medidas principais ficam nas variáveis em :root
      ============================================================ -->
 <style>
   :root {
     --vermelho: #e0262c;
+    --vermelho-escuro: #b81c21;
     --escuro: #1c2733;
-    --cinza: #6b7785;
+    --cinza: #5f6b79;          /* contraste AA sobre branco */
     --borda: #e6e9ee;
-    --fundo: #f6f7f9;
+    --fundo: #f3f4f6;
     --branco: #fff;
+    --verde: #1f9d55;
+    --raio: 12px;
+    --altura-abas: 52px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--fundo); color: var(--escuro); line-height: 1.35; padding-bottom: 90px; }
-  button, input { font: inherit; }
-  button { cursor: pointer; border: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--altura-abas) + 8px); -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--fundo); color: var(--escuro); line-height: 1.4;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+  body.travado { overflow: hidden; }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; background: none; -webkit-tap-highlight-color: transparent; }
+  img { display: block; max-width: 100%; }
   .oculto { display: none !important; }
+  .so-leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  /* Capa e perfil */
+  /* Foco visível para quem usa teclado */
+  :focus-visible { outline: 3px solid #1a73e8; outline-offset: 2px; border-radius: 6px; }
+
+  /* ---------- Capa e perfil ---------- */
   .capa {
-    height: 170px; background-color: #1a0f0a;
-    background-image: linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.55)), url("imagens/capa.jpg");
+    height: 180px; background-color: #1a0f0a;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,.1), rgba(0,0,0,.6)), url("imagens/capa.jpg");
     background-size: cover; background-position: center 62%;
   }
   .perfil { text-align: center; margin-top: -48px; padding: 0 16px 14px; background: linear-gradient(to bottom, transparent 48px, var(--branco) 48px); }
   .logo {
     width: 96px; height: 96px; border-radius: 50%; border: 4px solid var(--branco);
     background: var(--vermelho); color: var(--branco); font-size: 2.6rem;
-    display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,.28);
   }
-  .perfil h1 { font-size: 1rem; margin-top: 8px; letter-spacing: .5px; }
-  .perfil .slogan { font-size: .8rem; color: var(--cinza); }
+  .perfil h1 { font-size: 1.15rem; margin-top: 8px; letter-spacing: .6px; }
+  .perfil .slogan { font-size: .85rem; color: var(--cinza); }
 
-  .conteudo { max-width: 900px; margin: 0 auto; background: var(--branco); }
-  .barra { display: flex; gap: 8px; padding: 10px 16px; flex-wrap: wrap; }
-  .busca { flex: 1 1 100%; display: flex; align-items: center; border: 1px solid var(--borda); border-radius: 6px; padding: 0 10px; }
-  .busca input { flex: 1; border: 0; padding: 10px 6px; outline: 0; font-size: .9rem; }
+  .conteudo { max-width: 900px; margin: 0 auto; background: var(--branco); min-height: 100vh; box-shadow: 0 0 0 1px var(--borda); }
+  .barra { display: flex; gap: 8px; padding: 10px 16px 14px; flex-wrap: wrap; }
+  .busca { flex: 1 1 100%; display: flex; align-items: center; gap: 6px; border: 1px solid var(--borda); border-radius: 8px; padding: 0 12px; background: var(--fundo); }
+  .busca:focus-within { border-color: var(--vermelho); background: var(--branco); }
+  .busca input { flex: 1; border: 0; padding: 12px 4px; outline: 0; background: transparent; font-size: 1rem; /* 16px evita zoom no iPhone */ min-width: 0; }
   .btn-contorno {
-    flex: 1 1 140px; background: var(--branco); color: var(--vermelho); border: 1px solid var(--vermelho);
-    border-radius: 6px; padding: 9px 10px; font-size: .85rem;
+    flex: 1 1 140px; background: var(--branco); color: var(--vermelho-escuro); border: 1px solid var(--vermelho);
+    border-radius: 8px; padding: 10px; font-size: .88rem; font-weight: 600; transition: background .15s;
   }
   .btn-contorno:hover { background: #fdecec; }
 
-  /* Abas */
-  .abas { position: sticky; top: 0; z-index: 20; display: flex; gap: 22px; overflow-x: auto; padding: 0 16px; background: var(--branco); border-bottom: 1px solid var(--borda); box-shadow: 0 4px 6px -6px rgba(0,0,0,.3); }
-  .aba { background: none; padding: 14px 2px; font-size: .8rem; color: var(--cinza); text-transform: uppercase; white-space: nowrap; border-bottom: 3px solid transparent; }
-  .aba.ativa { color: var(--vermelho); border-bottom-color: var(--vermelho); font-weight: 700; }
+  /* ---------- Abas ---------- */
+  .abas {
+    position: sticky; top: 0; z-index: 20; display: flex; gap: 22px; overflow-x: auto; padding: 0 16px;
+    background: var(--branco); border-bottom: 1px solid var(--borda); box-shadow: 0 4px 6px -6px rgba(0,0,0,.3);
+    scrollbar-width: none; height: var(--altura-abas);
+  }
+  .abas::-webkit-scrollbar { display: none; }
+  .aba { padding: 0 2px; font-size: .82rem; color: var(--cinza); text-transform: uppercase; white-space: nowrap; border-bottom: 3px solid transparent; font-weight: 600; letter-spacing: .3px; }
+  .aba.ativa { color: var(--vermelho-escuro); border-bottom-color: var(--vermelho); }
 
-  /* Produtos */
-  .secao { padding: 0 16px; scroll-margin-top: 56px; }
-  .secao h2 { font-size: 1rem; margin: 20px 0 12px; }
+  /* ---------- Produtos ---------- */
+  .secao { padding: 0 16px; }
+  .secao h2 { font-size: 1.05rem; margin: 22px 0 12px; }
   .secao h2::before { content: "›"; color: var(--vermelho); font-weight: 900; margin-right: 6px; }
   .lista { display: grid; gap: 12px; grid-template-columns: 1fr; }
   @media (min-width: 640px) { .lista { grid-template-columns: 1fr 1fr; } }
+
   .produto {
-    background: var(--branco); border: 1px solid var(--borda); border-radius: 8px; padding: 14px;
-    display: flex; gap: 12px; text-align: left; width: 100%; transition: box-shadow .15s;
+    position: relative; background: var(--branco); border: 1px solid var(--borda); border-radius: var(--raio); padding: 14px;
+    display: flex; gap: 12px; text-align: left; width: 100%;
+    transition: box-shadow .2s, transform .1s, border-color .2s;
+  }
+  .produto:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); border-color: #d5dae1; }
+  .produto:active { transform: scale(.985); }
+  .produto[data-qtd]:not([data-qtd="0"]) { border-color: var(--vermelho); }
+  .produto[data-qtd]:not([data-qtd="0"])::after {
+    content: attr(data-qtd) "x"; position: absolute; top: -8px; left: 12px;
+    background: var(--vermelho); color: var(--branco); font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;
   }
   .produto .texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-  .produto .foto { width: 96px; height: 96px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--fundo); align-self: center; }
-  .produto:hover { box-shadow: 0 3px 12px rgba(0,0,0,.12); }
-  .produto .nome { font-weight: 700; font-size: .95rem; }
-  .produto .desc { font-size: .78rem; color: var(--cinza); text-transform: uppercase; flex: 1; }
+  .produto .nome { font-weight: 700; font-size: 1rem; }
+  .produto .desc { font-size: .78rem; color: var(--cinza); text-transform: uppercase; flex: 1; letter-spacing: .2px; }
   .produto .rodape { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
-  .produto .preco { font-weight: 800; color: var(--escuro); }
-  .produto .mais { background: var(--vermelho); color: var(--branco); width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; line-height: 1; }
-  .sem-resultado { padding: 30px 16px; text-align: center; color: var(--cinza); }
+  .produto .preco { font-weight: 800; }
+  .produto .mais { background: var(--vermelho); color: var(--branco); width: 32px; height: 32px; border-radius: 50%; font-size: 1.3rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+  .produto .foto-caixa { width: 96px; height: 96px; border-radius: 10px; overflow: hidden; flex-shrink: 0; align-self: center; background: linear-gradient(110deg, #eceff3 30%, #f7f8fa 50%, #eceff3 70%); background-size: 200% 100%; animation: brilho 1.4s infinite linear; }
+  .produto .foto { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+  .produto:hover .foto { transform: scale(1.07); }
+  @keyframes brilho { to { background-position: -200% 0; } }
+  .sem-resultado { padding: 36px 16px; text-align: center; color: var(--cinza); }
 
-  .rodape-loja { padding: 22px 16px; font-size: .8rem; color: var(--cinza); border-top: 1px solid var(--borda); margin-top: 24px; }
+  .rodape-loja { padding: 22px 16px; font-size: .85rem; color: var(--cinza); border-top: 1px solid var(--borda); margin-top: 28px; line-height: 1.7; }
 
-  /* Barra do pedido (fixa embaixo) */
+  /* ---------- Aviso rápido (toast) ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 60;
+    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    background: var(--escuro); color: var(--branco); padding: 10px 16px; border-radius: 24px; font-size: .88rem;
+    max-width: calc(100% - 32px); box-shadow: 0 6px 20px rgba(0,0,0,.3); transition: opacity .2s, transform .2s;
+  }
+  .toast.visivel { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- Barra do pedido (fixa embaixo) ---------- */
   .barra-pedido {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
     background: var(--branco); border-top: 1px solid var(--borda); box-shadow: 0 -4px 14px rgba(0,0,0,.1);
+    animation: sobe .25s ease-out;
   }
   .barra-pedido button {
-    display: flex; justify-content: space-between; width: 100%; max-width: 900px; margin: 0 auto;
-    background: var(--vermelho); color: var(--branco); padding: 14px 18px; border-radius: 8px; font-weight: 700;
+    display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 868px; margin: 0 auto;
+    background: var(--vermelho); color: var(--branco); padding: 15px 18px; border-radius: 10px; font-weight: 700; transition: background .15s;
   }
+  .barra-pedido button:hover { background: var(--vermelho-escuro); }
 
-  /* Painéis (modal inferior) */
-  .fundo { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
-  .painel { background: var(--branco); width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; border-radius: 16px 16px 0 0; padding: 20px; }
-  @media (min-width: 640px) { .fundo { align-items: center; } .painel { border-radius: 16px; } }
-  .painel h3 { margin-bottom: 12px; }
-  .painel .fechar { float: right; background: none; font-size: 1.6rem; color: var(--cinza); }
-  .linha { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--borda); }
+  /* ---------- Painéis (modal inferior) ---------- */
+  .fundo { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 100; display: flex; align-items: flex-end; justify-content: center; animation: aparece .2s; }
+  .painel {
+    background: var(--branco); width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; overscroll-behavior: contain;
+    border-radius: 18px 18px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); animation: sobe .25s ease-out;
+  }
+  @media (min-width: 640px) { .fundo { align-items: center; } .painel { border-radius: 18px; } }
+  .painel h3 { margin-bottom: 12px; font-size: 1.15rem; }
+  .painel .fechar { float: right; width: 36px; height: 36px; font-size: 1.7rem; line-height: 1; color: var(--cinza); border-radius: 50%; }
+  .painel .fechar:hover { background: var(--fundo); }
+  .linha { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--borda); }
   .linha.sem-borda { border: 0; padding: 3px 0; }
-  .qtd { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
-  .qtd button { width: 26px; height: 26px; border-radius: 50%; background: var(--fundo); border: 1px solid var(--borda); font-weight: 800; }
-  .total { font-size: 1.15rem; font-weight: 800; color: var(--vermelho); }
-  .campo { display: block; font-weight: 600; font-size: .85rem; margin-top: 10px; }
-  .campo input, .campo select { width: 100%; padding: 11px; margin-top: 4px; border: 1px solid var(--borda); border-radius: 6px; font: inherit; }
-  .campo input.erro { border-color: var(--vermelho); background: #fdecec; }
-  .btn-principal { width: 100%; background: var(--vermelho); color: var(--branco); padding: 14px; border-radius: 8px; font-weight: 700; margin-top: 14px; }
-  .btn-whats { background: #25d366; }
-  .msg-erro { color: var(--vermelho); font-weight: 600; min-height: 1.2em; margin-top: 8px; font-size: .85rem; }
-  .info p { margin: 6px 0; font-size: .9rem; }
+  .qtd { display: inline-flex; align-items: center; gap: 10px; margin-top: 6px; }
+  .qtd button { width: 30px; height: 30px; border-radius: 50%; background: var(--fundo); border: 1px solid var(--borda); font-weight: 800; }
+  .qtd button:hover { border-color: var(--vermelho); color: var(--vermelho); }
+  .total { font-size: 1.2rem; font-weight: 800; color: var(--vermelho-escuro); }
+  .campo { display: block; font-weight: 600; font-size: .88rem; margin-top: 12px; }
+  .campo input, .campo select { width: 100%; padding: 12px; margin-top: 4px; border: 1px solid #cfd5dd; border-radius: 8px; font-size: 1rem; background: var(--branco); }
+  .campo input:focus, .campo select:focus { border-color: var(--vermelho); outline: 0; box-shadow: 0 0 0 3px rgba(224,38,44,.18); }
+  .campo input.erro, .campo select.erro { border-color: var(--vermelho); background: #fdecec; }
+  .btn-principal { width: 100%; background: var(--vermelho); color: var(--branco); padding: 15px; border-radius: 10px; font-weight: 700; margin-top: 16px; transition: background .15s; }
+  .btn-principal:hover { background: var(--vermelho-escuro); }
+  .btn-whats { background: #1faa59; }
+  .btn-whats:hover { background: #178a47; }
+  .msg-erro { color: var(--vermelho-escuro); font-weight: 600; min-height: 1.3em; margin-top: 10px; font-size: .88rem; }
+  .info p { margin: 8px 0; font-size: .95rem; }
+  .dica { font-size: .78rem; color: var(--cinza); margin-top: 10px; }
+
+  @keyframes sobe { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Respeita quem prefere menos movimento */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
 
 <div class="conteudo">
-  <div class="capa"></div>
+  <div class="capa" role="img" aria-label="Hambúrguer com batatas fritas"></div>
   <header class="perfil">
-    <div class="logo">🍔</div>
+    <div class="logo" aria-hidden="true">🍔</div>
     <h1 id="nome-loja"></h1>
     <p class="slogan" id="slogan"></p>
   </header>
 
   <div class="barra">
-    <label class="busca"><span aria-hidden="true">🔍</span>
-      <input type="search" id="busca" placeholder="Pesquisar produtos por nome ou descrição">
-    </label>
-    <button class="btn-contorno" id="btn-pedidos">Meus Pedidos</button>
-    <button class="btn-contorno" id="btn-taxa">Taxa e Tempo de Entrega</button>
+    <div class="busca" role="search">
+      <span aria-hidden="true">🔍</span>
+      <label class="so-leitor" for="busca">Pesquisar produtos</label>
+      <input type="search" id="busca" placeholder="Pesquisar produtos por nome ou descrição" autocomplete="off">
+    </div>
+    <button type="button" class="btn-contorno" id="btn-pedidos">Meus Pedidos</button>
+    <button type="button" class="btn-contorno" id="btn-taxa">Taxa e Tempo de Entrega</button>
   </div>
 
-  <nav class="abas" id="abas"></nav>
+  <nav class="abas" id="abas" aria-label="Categorias do cardápio"></nav>
   <main id="secoes"></main>
 
   <footer class="rodape-loja" id="rodape-loja"></footer>
 </div>
 
+<!-- Aviso rápido ao adicionar item -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <!-- Barra fixa do pedido -->
 <div class="barra-pedido oculto" id="barra-pedido">
-  <button id="btn-ver-pedido"><span id="barra-qtd"></span><span>Ver pedido</span><span id="barra-total"></span></button>
+  <button type="button" id="btn-ver-pedido" aria-label="Ver pedido">
+    <span id="barra-qtd"></span><span>Ver pedido</span><span id="barra-total"></span>
+  </button>
 </div>
 
 <!-- Painel genérico -->
 <div class="fundo oculto" id="fundo">
-  <div class="painel" role="dialog" aria-modal="true">
-    <button class="fechar" id="btn-fechar" aria-label="Fechar">×</button>
+  <div class="painel" role="dialog" aria-modal="true" aria-labelledby="painel-titulo">
+    <button type="button" class="fechar" id="btn-fechar" aria-label="Fechar">×</button>
     <div id="painel-conteudo"></div>
   </div>
 </div>
@@ -159,7 +237,8 @@ const LOJA = {
 };
 
 /* ============================================================
-   2) CARDÁPIO  ← EDITE AQUI (nomes, descrições e preços)
+   2) CARDÁPIO  ← EDITE AQUI (nomes, descrições, preços e fotos)
+   "foto" é o nome do arquivo em imagens/ (sem o .jpg). Pode deixar vazio.
    ============================================================ */
 const CARDAPIO = [
   { categoria: "Hambúrguer Artesanal", itens: [
@@ -178,9 +257,9 @@ const CARDAPIO = [
     { nome: "Água com Gás 500ml",      desc: "", preco: 3.00, foto: "agua-com-gas" }
   ]},
   { categoria: "Batata Frita", itens: [
-    { nome: "Porção de Batata Frita",            desc: "Porção 400g", preco: 19.00, foto: "batata" },
-    { nome: "Batata Frita Cheddar e Bacon",      desc: "Porção 400g", preco: 25.00, foto: "batata-cheddar" },
-    { nome: "Batata Frita Pequena",              desc: "Saquinho", preco: 6.00, foto: "batata-pequena" }
+    { nome: "Porção de Batata Frita",       desc: "Porção 400g", preco: 19.00, foto: "batata" },
+    { nome: "Batata Frita Cheddar e Bacon", desc: "Porção 400g", preco: 25.00, foto: "batata-cheddar" },
+    { nome: "Batata Frita Pequena",         desc: "Saquinho", preco: 6.00, foto: "batata-pequena" }
   ]}
 ];
 
@@ -188,13 +267,20 @@ const CARDAPIO = [
    3) ESTADO E UTILITÁRIOS
    ============================================================ */
 let carrinho = {};   // { "nome do item": { nome, preco, qtd } }
+let ultimoFoco = null;
+let temporizadorToast;
+const CHAVE_CLIENTE = "burger-modelo-cliente";
 const $ = (id) => document.getElementById(id);
 const moeda = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const itensCarrinho = () => Object.values(carrinho);
 const subtotal = () => itensCarrinho().reduce((t, i) => t + i.preco * i.qtd, 0);
 const totalQtd = () => itensCarrinho().reduce((t, i) => t + i.qtd, 0);
-const slug = (s) => "cat-" + s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-");
+const slug = (s) => "cat-" + s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-");
+
+// Guardar os dados do cliente só neste aparelho (nunca é enviado a lugar nenhum)
+const lerCliente = () => { try { return JSON.parse(localStorage.getItem(CHAVE_CLIENTE)) || {}; } catch (e) { return {}; } };
+const salvarCliente = (d) => { try { localStorage.setItem(CHAVE_CLIENTE, JSON.stringify(d)); } catch (e) { /* sem armazenamento: tudo bem */ } };
 
 /* ============================================================
    4) CARDÁPIO NA TELA
@@ -207,9 +293,10 @@ function montarLoja() {
     `<strong>${esc(LOJA.nome)}</strong><br>Telefone: ${esc(LOJA.telefone)}<br>Endereço: ${esc(LOJA.endereco)}`;
 
   $("abas").innerHTML = CARDAPIO.map((c, i) =>
-    `<button class="aba ${i === 0 ? "ativa" : ""}" data-alvo="${slug(c.categoria)}">${esc(c.categoria)}</button>`).join("");
+    `<button type="button" class="aba ${i === 0 ? "ativa" : ""}" data-alvo="${slug(c.categoria)}">${esc(c.categoria)}</button>`).join("");
   document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => {
-    $(b.dataset.alvo).scrollIntoView({ behavior: "smooth" });
+    const alvo = $(b.dataset.alvo);
+    if (alvo) alvo.scrollIntoView({ behavior: "smooth" });
   }));
   desenharProdutos("");
 }
@@ -219,22 +306,25 @@ function desenharProdutos(filtro) {
   const html = CARDAPIO.map((cat) => {
     const itens = cat.itens.filter((i) => !termo || (i.nome + " " + i.desc).toLowerCase().includes(termo));
     if (!itens.length) return "";
-    return `<section class="secao" id="${slug(cat.categoria)}">
+    return `<section class="secao" id="${slug(cat.categoria)}" aria-label="${esc(cat.categoria)}">
       <h2>${esc(cat.categoria.toUpperCase())}</h2>
       <div class="lista">${itens.map((i) =>
-        `<button class="produto" data-nome="${esc(i.nome)}">
+        `<button type="button" class="produto" data-nome="${esc(i.nome)}" aria-label="Adicionar ${esc(i.nome)}, ${moeda(i.preco)}">
            <span class="texto">
              <span class="nome">${esc(i.nome)}</span>
              <span class="desc">${esc(i.desc)}</span>
              <span class="rodape"><span class="preco">${moeda(i.preco)}</span><span class="mais" aria-hidden="true">+</span></span>
            </span>
-           ${i.foto ? `<img class="foto" src="imagens/${esc(i.foto)}.jpg" alt="${esc(i.nome)}" loading="lazy" width="96" height="96">` : ""}
+           ${i.foto ? `<span class="foto-caixa"><img class="foto" src="imagens/${esc(i.foto)}.jpg" alt="" loading="lazy" decoding="async" width="96" height="96"></span>` : ""}
          </button>`).join("")}</div>
     </section>`;
   }).join("");
-  $("secoes").innerHTML = html || '<p class="sem-resultado">Nenhum produto encontrado.</p>';
-  document.querySelectorAll(".produto").forEach((b) =>
-    b.addEventListener("click", () => adicionar(b.dataset.nome)));
+  $("secoes").innerHTML = html || '<p class="sem-resultado">Nenhum produto encontrado para essa busca.</p>';
+  document.querySelectorAll(".produto").forEach((b) => b.addEventListener("click", () => adicionar(b.dataset.nome)));
+  // Se uma foto falhar, esconde só ela (o card continua bonito)
+  document.querySelectorAll(".produto .foto").forEach((img) =>
+    img.addEventListener("error", () => img.closest(".foto-caixa").remove()));
+  atualizarContadores();
 }
 
 function adicionar(nome) {
@@ -243,6 +333,15 @@ function adicionar(nome) {
   if (carrinho[nome]) carrinho[nome].qtd += 1;
   else carrinho[nome] = { nome, preco: item.preco, qtd: 1 };
   atualizarBarra();
+  avisar(`✓ ${nome} adicionado`);
+}
+
+// Mostra "2x" no cartão dos produtos que já estão no pedido
+function atualizarContadores() {
+  document.querySelectorAll(".produto").forEach((b) => {
+    const q = carrinho[b.dataset.nome] ? carrinho[b.dataset.nome].qtd : 0;
+    b.dataset.qtd = q;
+  });
 }
 
 function atualizarBarra() {
@@ -250,61 +349,95 @@ function atualizarBarra() {
   $("barra-pedido").classList.toggle("oculto", q === 0);
   $("barra-qtd").textContent = q + (q === 1 ? " item" : " itens");
   $("barra-total").textContent = moeda(subtotal());
+  atualizarContadores();
 }
 
-// Destaca a aba da categoria visível
+function avisar(texto) {
+  const t = $("toast");
+  t.textContent = texto;
+  t.classList.add("visivel");
+  clearTimeout(temporizadorToast);
+  temporizadorToast = setTimeout(() => t.classList.remove("visivel"), 1600);
+}
+
+// Destaca a aba da categoria visível e a mantém à vista
+let ticking = false;
 window.addEventListener("scroll", () => {
-  let atual = CARDAPIO[0] && slug(CARDAPIO[0].categoria);
-  CARDAPIO.forEach((c) => {
-    const el = $(slug(c.categoria));
-    if (el && el.getBoundingClientRect().top < 120) atual = slug(c.categoria);
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => {
+    let atual = CARDAPIO[0] && slug(CARDAPIO[0].categoria);
+    CARDAPIO.forEach((c) => {
+      const el = $(slug(c.categoria));
+      if (el && el.getBoundingClientRect().top < 120) atual = slug(c.categoria);
+    });
+    document.querySelectorAll(".aba").forEach((b) => {
+      const ativa = b.dataset.alvo === atual;
+      if (ativa && !b.classList.contains("ativa")) b.scrollIntoView({ inline: "center", block: "nearest" });
+      b.classList.toggle("ativa", ativa);
+    });
+    ticking = false;
   });
-  document.querySelectorAll(".aba").forEach((b) => b.classList.toggle("ativa", b.dataset.alvo === atual));
-});
+}, { passive: true });
 
 /* ============================================================
    5) PAINÉIS: pedido, checkout, taxa, meus pedidos
    ============================================================ */
-function abrirPainel(html) { $("painel-conteudo").innerHTML = html; $("fundo").classList.remove("oculto"); }
-function fecharPainel() { $("fundo").classList.add("oculto"); }
+function abrirPainel(html) {
+  if ($("fundo").classList.contains("oculto")) ultimoFoco = document.activeElement;
+  $("painel-conteudo").innerHTML = html;
+  $("fundo").classList.remove("oculto");
+  document.body.classList.add("travado");
+  $("btn-fechar").focus();
+}
+function fecharPainel() {
+  if ($("fundo").classList.contains("oculto")) return;
+  $("fundo").classList.add("oculto");
+  document.body.classList.remove("travado");
+  if (ultimoFoco && document.contains(ultimoFoco)) ultimoFoco.focus();
+}
 
 function painelPedido() {
-  if (!itensCarrinho().length) return;
+  if (!itensCarrinho().length) { fecharPainel(); return; }
   const linhas = itensCarrinho().map((i) =>
     `<div class="linha"><div><strong>${esc(i.nome)}</strong><br>
-       <span class="qtd"><button data-acao="-" data-nome="${esc(i.nome)}">−</button><span>${i.qtd}</span><button data-acao="+" data-nome="${esc(i.nome)}">+</button></span></div>
+       <span class="qtd"><button type="button" data-acao="-" data-nome="${esc(i.nome)}" aria-label="Diminuir ${esc(i.nome)}">−</button><span aria-live="polite">${i.qtd}</span><button type="button" data-acao="+" data-nome="${esc(i.nome)}" aria-label="Aumentar ${esc(i.nome)}">+</button></span></div>
      <strong>${moeda(i.preco * i.qtd)}</strong></div>`).join("");
-  abrirPainel(`<h3>Seu pedido</h3>${linhas}
+  abrirPainel(`<h3 id="painel-titulo">Seu pedido</h3>${linhas}
     <div class="linha sem-borda"><span>Subtotal</span><span>${moeda(subtotal())}</span></div>
     <div class="linha sem-borda"><span>Taxa de entrega</span><span>${moeda(LOJA.taxaEntrega)}</span></div>
     <div class="linha sem-borda total"><span>Total</span><span>${moeda(subtotal() + LOJA.taxaEntrega)}</span></div>
-    <button class="btn-principal" id="btn-continuar">Continuar</button>`);
+    <button type="button" class="btn-principal" id="btn-continuar">Continuar</button>`);
   document.querySelectorAll("[data-acao]").forEach((b) => b.addEventListener("click", () => {
     const it = carrinho[b.dataset.nome];
+    if (!it) return;
     it.qtd += b.dataset.acao === "+" ? 1 : -1;
     if (it.qtd <= 0) delete carrinho[b.dataset.nome];
     atualizarBarra();
-    itensCarrinho().length ? painelPedido() : fecharPainel();
+    painelPedido();
   }));
   $("btn-continuar").addEventListener("click", painelCheckout);
 }
 
 function painelCheckout() {
-  abrirPainel(`<h3>Entrega e pagamento</h3>
+  const c = lerCliente();
+  abrirPainel(`<h3 id="painel-titulo">Entrega e pagamento</h3>
     <form id="form" novalidate>
-      <label class="campo">Seu nome *<input id="f-nome" type="text"></label>
-      <label class="campo">Rua e número *<input id="f-rua" type="text"></label>
-      <label class="campo">Bairro *<input id="f-bairro" type="text"></label>
-      <label class="campo">Complemento / referência *<input id="f-comp" type="text"></label>
+      <label class="campo">Seu nome *<input id="f-nome" type="text" autocomplete="name" value="${esc(c.nome || "")}"></label>
+      <label class="campo">Rua e número *<input id="f-rua" type="text" autocomplete="street-address" value="${esc(c.rua || "")}"></label>
+      <label class="campo">Bairro *<input id="f-bairro" type="text" value="${esc(c.bairro || "")}"></label>
+      <label class="campo">Complemento / referência *<input id="f-comp" type="text" value="${esc(c.comp || "")}"></label>
       <label class="campo">Forma de pagamento *
         <select id="f-pag"><option value="">Selecione</option><option>Cartão de Crédito</option><option>Cartão de Débito</option><option>Pix</option><option>Dinheiro</option></select>
       </label>
-      <label class="campo oculto" id="bloco-troco">Troco para quanto? *<input id="f-troco" type="text" inputmode="decimal" placeholder="Ex.: 50"></label>
+      <label class="campo oculto" id="bloco-troco">Troco para quanto? *<input id="f-troco" type="text" inputmode="decimal" placeholder="Ex.: 50 (ou 0 se não precisa)"></label>
       <p class="msg-erro" id="msg-erro" role="alert"></p>
-      <button class="btn-principal btn-whats" type="submit">Enviar pedido por WhatsApp</button>
+      <button type="submit" class="btn-principal btn-whats">Enviar pedido por WhatsApp</button>
+      <p class="dica">Seus dados de entrega ficam salvos só neste aparelho, para o próximo pedido.</p>
     </form>`);
-  $("f-pag").addEventListener("change", (e) =>
-    $("bloco-troco").classList.toggle("oculto", e.target.value !== "Dinheiro"));
+  $("f-pag").addEventListener("change", (e) => {
+    $("bloco-troco").classList.toggle("oculto", e.target.value !== "Dinheiro");
+  });
   $("form").addEventListener("submit", enviar);
 }
 
@@ -312,16 +445,19 @@ function enviar(e) {
   e.preventDefault();
   const campos = [["f-nome", "Nome"], ["f-rua", "Rua e número"], ["f-bairro", "Bairro"], ["f-comp", "Complemento / referência"], ["f-pag", "Forma de pagamento"]];
   if ($("f-pag").value === "Dinheiro") campos.push(["f-troco", "Troco"]);
-  let erro = "";
+  let erro = "", primeiro = null;
+  ["f-nome", "f-rua", "f-bairro", "f-comp", "f-pag", "f-troco"].forEach((id) => $(id).classList.remove("erro"));
   campos.forEach(([id, rotulo]) => {
     const vazio = $(id).value.trim() === "";
     $(id).classList.toggle("erro", vazio);
-    if (vazio && !erro) erro = `Preencha: ${rotulo}.`;
+    if (vazio && !erro) { erro = `Preencha: ${rotulo}.`; primeiro = $(id); }
   });
   $("msg-erro").textContent = erro;
-  if (erro || !itensCarrinho().length) return;
+  if (erro) { primeiro.focus(); return; }
+  if (!itensCarrinho().length) { $("msg-erro").textContent = "Seu pedido está vazio."; return; }
 
   const v = (id) => $(id).value.trim();
+  salvarCliente({ nome: v("f-nome"), rua: v("f-rua"), bairro: v("f-bairro"), comp: v("f-comp") });
   const itens = itensCarrinho().map((i) => `• ${i.qtd}x ${i.nome} - ${moeda(i.preco * i.qtd)}`).join("\n");
   let msg = `*NOVO PEDIDO - ${LOJA.nome}*\n\nCliente: ${v("f-nome")}\n\n*Itens:*\n${itens}\n\n` +
     `Subtotal: ${moeda(subtotal())}\nTaxa de entrega: ${moeda(LOJA.taxaEntrega)}\n*Total: ${moeda(subtotal() + LOJA.taxaEntrega)}*\n\n` +
@@ -331,14 +467,14 @@ function enviar(e) {
 }
 
 function painelTaxa() {
-  abrirPainel(`<h3>Taxa e tempo de entrega</h3><div class="info">
+  abrirPainel(`<h3 id="painel-titulo">Taxa e tempo de entrega</h3><div class="info">
     <p><strong>Taxa fixa:</strong> ${moeda(LOJA.taxaEntrega)}</p>
     <p><strong>Tempo estimado:</strong> ${esc(LOJA.tempoEntrega)}</p>
     <p><strong>Endereço da loja:</strong> ${esc(LOJA.endereco)}</p></div>`);
 }
 
 function painelMeusPedidos() {
-  abrirPainel(`<h3>Meus pedidos</h3><div class="info"><p>Seus pedidos são enviados por WhatsApp.
+  abrirPainel(`<h3 id="painel-titulo">Meus pedidos</h3><div class="info"><p>Seus pedidos são enviados por WhatsApp.
     Para acompanhar um pedido, fale com a loja pelo telefone ${esc(LOJA.telefone)}.</p></div>`);
 }
 
@@ -351,7 +487,19 @@ $("btn-taxa").addEventListener("click", painelTaxa);
 $("btn-pedidos").addEventListener("click", painelMeusPedidos);
 $("btn-fechar").addEventListener("click", fecharPainel);
 $("fundo").addEventListener("click", (e) => { if (e.target === $("fundo")) fecharPainel(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharPainel(); });
+
+document.addEventListener("keydown", (e) => {
+  if ($("fundo").classList.contains("oculto")) return;
+  if (e.key === "Escape") { fecharPainel(); return; }
+  // Mantém o Tab dentro do painel aberto
+  if (e.key === "Tab") {
+    const foco = [...$("fundo").querySelectorAll("button, input, select")].filter((el) => el.offsetParent !== null);
+    if (!foco.length) return;
+    const primeiro = foco[0], ultimo = foco[foco.length - 1];
+    if (e.shiftKey && document.activeElement === primeiro) { e.preventDefault(); ultimo.focus(); }
+    else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primeiro.focus(); }
+  }
+});
 
 montarLoja();
 </script>
