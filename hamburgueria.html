@@ -295,24 +295,38 @@ const LOJA = {
    ============================================================ */
 const CARDAPIO = [
   { categoria: "Hambúrguer Artesanal", itens: [
-    { nome: "Hambúrguer da Casa",  desc: "Pão brioche, blend 140g, cheddar, molho, alface", preco: 12.00, foto: "hamburguer-casa" },
-    { nome: "Hambúrguer Duplo",    desc: "Pão brioche, 2 blends 140g, 2 cheddar, molho, alface", preco: 19.00, foto: "hamburguer-duplo", selo: "Mais pedido" },
-    { nome: "Hambúrguer Triplo",   desc: "Pão brioche, 3 blends 140g, 3 cheddar, molho, alface", preco: 25.00, foto: "hamburguer-triplo" },
-    { nome: "Trio Artesanal",      desc: "Hambúrguer da casa, refrigerante lata e porção pequena de batata", preco: 21.00, foto: "capa", selo: "Combo" },
-    { nome: "Dog no Molho",        desc: "Pão de leite, salsicha, milho, batata palha, queijo e molho", preco: 11.00, foto: "dog" },
-    { nome: "Combo Família",       desc: "5 hambúrgueres, 1 batata grande com cheddar e bacon, 1 refrigerante 1,5L", preco: 85.00, foto: "combo-familia", selo: "Para dividir" }
+    { nome: "Hambúrguer da Casa", desc: "Pão brioche, blend 140g, cheddar, molho e alface. Assado na brasa.", preco: 10.00, foto: "hamburguer-casa" },
+    { nome: "Hambúrguer Duplo",   desc: "Pão brioche, 2 blends 140g, 2 cheddar, molho e alface. Assado na brasa.", preco: 17.99, foto: "hamburguer-duplo", selo: "Mais pedido" },
+    { nome: "Hambúrguer Triplo",  desc: "Pão brioche, 3 blends 140g, 3 cheddar, molho e alface. Assado na brasa.", preco: 23.99, foto: "hamburguer-triplo" },
+    { nome: "Trio Artesanal",     desc: "Hambúrguer da casa, Coca-Cola lata e porção pequena de batata.", preco: 19.99, foto: "capa", selo: "Combo" },
+    { nome: "Trio Duplo",         desc: "Hambúrguer duplo, refrigerante lata e porção pequena de batata.", preco: 26.99, foto: "trio-duplo", selo: "Combo" },
+    { nome: "Trio Triplo",        desc: "Hambúrguer triplo, refrigerante lata e porção pequena de batata.", preco: 33.99, foto: "hamburguer-triplo", selo: "Combo" },
+    { nome: "Dog no Molho",       desc: "Pão de leite Ninho, salsicha Perdigão, milho, batata, queijo e molho.", preco: 10.00, foto: "dog" },
+    { nome: "Combo Família",      desc: "5 hambúrgueres, 1 batata grande com cheddar e bacon e 1 Guaraná Mineiro.", preco: 79.99, foto: "combo-familia", selo: "Para dividir" },
+    { nome: "Sachê Heinz",        desc: "3 sachês de ketchup e 3 sachês de maionese.", preco: 2.00 }
   ]},
   { categoria: "Bebidas", itens: [
-    { nome: "Refrigerante Lata 310ml", desc: "Cola, guaraná ou laranja", preco: 6.00, foto: "refri-lata" },
-    { nome: "Refrigerante 2L",         desc: "Cola ou guaraná", preco: 14.00, foto: "refri-2l" },
-    { nome: "Suco de Uva Lata",        desc: "", preco: 8.00, foto: "suco-uva" },
-    { nome: "Água sem Gás 500ml",      desc: "", preco: 3.50, foto: "agua-sem-gas" },
-    { nome: "Água com Gás 500ml",      desc: "", preco: 3.00, foto: "agua-com-gas" }
+    { nome: "Coca-Cola Lata 310ml",       desc: "", preco: 6.00,  foto: "refri-lata" },
+    { nome: "Coca-Cola Zero 310ml",       desc: "", preco: 6.00,  foto: "refri-lata" },
+    { nome: "Guaraná 269ml",              desc: "", preco: 6.00,  foto: "refri-generico" },
+    { nome: "Fanta Laranja 310ml",        desc: "", preco: 6.00,  foto: "refri-laranja" },
+    { nome: "Schweppes 310ml",            desc: "", preco: 6.00,  foto: "refri-generico" },
+    { nome: "Coca-Cola 600ml",            desc: "", preco: 9.00,  foto: "refri-2l" },
+    { nome: "Mineiro 1,5L",               desc: "Guaraná Mineiro", preco: 9.00, foto: "refri-2l" },
+    { nome: "Coca-Cola 2L",               desc: "", preco: 15.00, foto: "refri-2l" },
+    { nome: "Coca-Cola Zero 2L",          desc: "", preco: 15.00, foto: "refri-2l" },
+    { nome: "Suco de Uva Del Valle",      desc: "", preco: 8.00,  foto: "suco-uva" },
+    { nome: "Suco de Uva Del Valle Lata", desc: "", preco: 8.00,  foto: "suco-uva" },
+    { nome: "Suco de Maracujá Del Valle", desc: "", preco: 8.00,  foto: "suco-maracuja" },
+    { nome: "Água sem Gás 500ml",         desc: "", preco: 3.50,  foto: "agua-sem-gas" },
+    { nome: "Água com Gás 500ml",         desc: "", preco: 3.00,  foto: "agua-com-gas" },
+    { nome: "Heineken Long Neck 330ml",   desc: "Venda proibida para menores de 18 anos.", preco: 11.00, foto: "cerveja" }
   ]},
   { categoria: "Batata Frita", itens: [
-    { nome: "Porção de Batata Frita",       desc: "Porção 400g", preco: 19.00, foto: "batata" },
-    { nome: "Batata Frita Cheddar e Bacon", desc: "Porção 400g", preco: 25.00, foto: "batata-cheddar" },
-    { nome: "Batata Frita Pequena",         desc: "Saquinho", preco: 6.00, foto: "batata-pequena" }
+    { nome: "Porção de Batata Frita",                 desc: "Porção 400g", preco: 18.99, foto: "batata" },
+    { nome: "Porção de Batata Frita Cheddar e Bacon", desc: "Porção 400g", preco: 24.99, foto: "batata-cheddar", selo: "Mais pedido" },
+    { nome: "Porção de Batata Frita Queijo e Bacon",  desc: "Porção 400g", preco: 24.99, foto: "batata-cheddar" },
+    { nome: "Batata Frita Pequena",                   desc: "Saquinho", preco: 5.99, foto: "batata-pequena" }
   ]}
 ];
 
@@ -321,6 +335,7 @@ const CARDAPIO = [
    ============================================================ */
 let carrinho = {};   // { "nome do item": { nome, preco, qtd } }
 let primeiraVez = true;
+let categoriaAtiva = 0;   // aba aberta no momento (0 = primeira)
 let ultimoFoco = null;
 let temporizadorToast;
 const CHAVE_CLIENTE = "burger-modelo-cliente";
@@ -348,17 +363,34 @@ function montarLoja() {
     `<strong>${esc(LOJA.nome)}</strong><br>Telefone: ${esc(LOJA.telefone)}<br>Endereço: ${esc(LOJA.endereco)}`;
 
   $("abas").innerHTML = CARDAPIO.map((c, i) =>
-    `<button type="button" class="aba ${i === 0 ? "ativa" : ""}" data-alvo="${slug(c.categoria)}">${esc(c.categoria)}</button>`).join("");
+    `<button type="button" role="tab" class="aba ${i === 0 ? "ativa" : ""}" aria-selected="${i === 0}" data-cat="${i}">${esc(c.categoria)}</button>`).join("");
+  $("abas").setAttribute("role", "tablist");
   document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => {
-    const alvo = $(b.dataset.alvo);
-    if (alvo) alvo.scrollIntoView({ behavior: "smooth" });
+    categoriaAtiva = Number(b.dataset.cat);
+    $("busca").value = "";
+    primeiraVez = true;                       // anima os cards da nova aba
+    desenharProdutos("");
+    // se o topo do cardápio já rolou para fora da tela, volta até ele
+    const topo = $("secoes").getBoundingClientRect().top;
+    if (topo < 70) window.scrollBy({ top: topo - 70, behavior: "smooth" });
   }));
   desenharProdutos("");
 }
 
+// Marca a aba aberta (ou nenhuma, enquanto o cliente está buscando)
+function marcarAba(buscando) {
+  document.querySelectorAll(".aba").forEach((b, i) => {
+    const ativa = !buscando && i === categoriaAtiva;
+    b.classList.toggle("ativa", ativa);
+    b.setAttribute("aria-selected", ativa);
+  });
+}
+
 function desenharProdutos(filtro) {
   const termo = filtro.trim().toLowerCase();
-  const html = CARDAPIO.map((cat) => {
+  const categorias = termo ? CARDAPIO : [CARDAPIO[categoriaAtiva]];   // com busca, procura em todas as abas
+  marcarAba(Boolean(termo));
+  const html = categorias.map((cat) => {
     const itens = cat.itens.filter((i) => !termo || (i.nome + " " + i.desc).toLowerCase().includes(termo));
     if (!itens.length) return "";
     return `<section class="secao" id="${slug(cat.categoria)}" aria-label="${esc(cat.categoria)}">
@@ -416,26 +448,6 @@ function avisar(texto) {
   clearTimeout(temporizadorToast);
   temporizadorToast = setTimeout(() => t.classList.remove("visivel"), 1600);
 }
-
-// Destaca a aba da categoria visível e a mantém à vista
-let ticking = false;
-window.addEventListener("scroll", () => {
-  if (ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => {
-    let atual = CARDAPIO[0] && slug(CARDAPIO[0].categoria);
-    CARDAPIO.forEach((c) => {
-      const el = $(slug(c.categoria));
-      if (el && el.getBoundingClientRect().top < 120) atual = slug(c.categoria);
-    });
-    document.querySelectorAll(".aba").forEach((b) => {
-      const ativa = b.dataset.alvo === atual;
-      if (ativa && !b.classList.contains("ativa")) b.scrollIntoView({ inline: "center", block: "nearest" });
-      b.classList.toggle("ativa", ativa);
-    });
-    ticking = false;
-  });
-}, { passive: true });
 
 /* ============================================================
    5) PAINÉIS: pedido, checkout, taxa, meus pedidos

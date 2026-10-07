@@ -21,6 +21,11 @@ nome do fotógrafo.
 | `batata.jpg` | https://unsplash.com/photos/PtFTpdv-aWw |
 | `batata-cheddar.jpg` | https://unsplash.com/photos/ChXHveqrb28 |
 | `batata-pequena.jpg` | https://unsplash.com/photos/nDCE7aIXpCQ |
+| `trio-duplo.jpg` | https://unsplash.com/photos/m71QWdVCR2s |
+| `refri-laranja.jpg` | https://unsplash.com/photos/vVHOk7_d3hw |
+| `refri-generico.jpg` | https://unsplash.com/photos/9kV4pyWkze8 |
+| `suco-maracuja.jpg` | https://unsplash.com/photos/bRj_LwzC8Vg |
+| `cerveja.jpg` | https://unsplash.com/photos/6No8ya7NkQE |
 
 Para trocar uma foto, substitua o arquivo em `imagens/` mantendo o nome, ou mude o campo
 `foto` do item em `CARDAPIO` no `hamburgueria.html`.
