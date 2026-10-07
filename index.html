@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pizzaria Bella Massa – Delivery</title>
+
+<!-- ============================================================
+     ESTILOS (CSS)
+     Cores principais ficam nas variáveis em :root
+     ============================================================ -->
+<style>
+  :root {
+    --vermelho: #c0392b;
+    --vermelho-escuro: #922b21;
+    --laranja: #e67e22;
+    --madeira: #5d4037;
+    --madeira-clara: #8d6e63;
+    --creme: #fff8f0;
+    --branco: #ffffff;
+    --texto: #2d1e1a;
+    --sombra: 0 4px 14px rgba(0, 0, 0, .15);
+    --raio: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--creme);
+    color: var(--texto);
+    line-height: 1.4;
+  }
+  button { font: inherit; cursor: pointer; border: 0; }
+  .oculto { display: none !important; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background:
+      linear-gradient(135deg, rgba(146, 43, 33, .95), rgba(230, 126, 34, .92)),
+      repeating-linear-gradient(90deg, var(--madeira) 0 12px, var(--madeira-clara) 12px 24px);
+    color: var(--branco);
+    text-align: center;
+    padding: 56px 20px 64px;
+    border-bottom: 8px solid var(--madeira);
+  }
+  .hero h1 { font-size: clamp(2rem, 7vw, 3.4rem); letter-spacing: 1px; }
+  .hero p { font-size: clamp(1rem, 3.5vw, 1.35rem); margin-top: 10px; opacity: .95; }
+
+  /* ---------- Botão do carrinho (canto direito) ---------- */
+  .btn-carrinho {
+    position: fixed; top: 14px; right: 14px; z-index: 50;
+    background: var(--branco); color: var(--vermelho);
+    width: 56px; height: 56px; border-radius: 50%;
+    font-size: 1.6rem; box-shadow: var(--sombra);
+  }
+  .btn-carrinho .contador {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--vermelho); color: var(--branco);
+    min-width: 24px; height: 24px; border-radius: 12px;
+    font-size: .8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; padding: 0 6px;
+  }
+
+  /* ---------- Seções ---------- */
+  main { max-width: 960px; margin: 0 auto; padding: 28px 16px 60px; }
+  h2.titulo {
+    color: var(--vermelho-escuro); margin: 28px 0 14px; font-size: 1.5rem;
+    border-left: 6px solid var(--laranja); padding-left: 10px;
+  }
+  .grid-pizzas {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-bebidas {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (min-width: 700px) {
+    .grid-pizzas { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .card {
+    background: var(--branco); border-radius: var(--raio);
+    box-shadow: var(--sombra); text-align: center;
+    border: 3px solid transparent; transition: transform .15s, border-color .15s;
+  }
+  .card:hover, .card:focus-visible { transform: translateY(-4px); border-color: var(--laranja); outline: 0; }
+  .card-pizza {
+    aspect-ratio: 1 / 1; padding: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  }
+  .card-pizza .emoji { font-size: clamp(2.4rem, 12vw, 4rem); }
+  .card-pizza .tipo { font-weight: 700; color: var(--vermelho); text-transform: uppercase; font-size: .85rem; letter-spacing: 1px; }
+  .card-pizza .tamanho { font-size: clamp(1.1rem, 4.5vw, 1.5rem); font-weight: 800; }
+  .card-pizza .detalhe { font-size: .8rem; color: var(--madeira-clara); }
+  .card-pizza.doce .tipo { color: var(--madeira); }
+
+  .card-bebida {
+    aspect-ratio: 1 / 1; padding: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .card-bebida .emoji { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+  .card-bebida .nome { font-weight: 700; font-size: clamp(.8rem, 3vw, 1rem); }
+  .card-bebida .preco { color: var(--vermelho); font-weight: 800; }
+
+  /* ---------- Modais ---------- */
+  .fundo {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, .55); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal {
+    background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra);
+    width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto; padding: 22px;
+  }
+  .modal h3 { color: var(--vermelho-escuro); margin-bottom: 14px; }
+  .modal .fechar {
+    float: right; background: none; font-size: 1.5rem; color: var(--madeira-clara);
+  }
+  .sabor {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 0; border-bottom: 1px solid #eee;
+  }
+  .sabor .info strong { display: block; }
+  .sabor .info span { color: var(--vermelho); font-weight: 700; }
+  .btn {
+    background: var(--vermelho); color: var(--branco); padding: 10px 16px;
+    border-radius: 10px; font-weight: 700; transition: background .15s;
+  }
+  .btn:hover { background: var(--vermelho-escuro); }
+  .btn.secundario { background: var(--madeira); }
+  .btn.secundario:hover { background: #3e2723; }
+  .btn.grande { width: 100%; padding: 16px; font-size: 1.05rem; border-radius: 12px; }
+  .acoes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .acoes .btn { flex: 1 1 140px; }
+
+  /* ---------- Sidebar do carrinho ---------- */
+  .sidebar-fundo { position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 150; }
+  .sidebar {
+    position: fixed; top: 0; right: 0; height: 100%; width: min(100%, 400px);
+    background: var(--branco); z-index: 160; padding: 20px;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform .3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, .25);
+  }
+  .sidebar.aberta { transform: translateX(0); }
+  .sidebar header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .sidebar header h3 { color: var(--vermelho-escuro); }
+  .sidebar header button { background: none; font-size: 1.6rem; color: var(--madeira-clara); }
+  .itens-carrinho { flex: 1; overflow-y: auto; }
+  .item-carrinho { padding: 10px 0; border-bottom: 1px solid #eee; }
+  .item-carrinho .linha { display: flex; justify-content: space-between; gap: 8px; }
+  .item-carrinho .nome { font-weight: 700; }
+  .item-carrinho .tam { font-size: .85rem; color: var(--madeira-clara); }
+  .qtd { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qtd button {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--creme); border: 1px solid var(--laranja); color: var(--vermelho); font-weight: 800;
+  }
+  .vazio { text-align: center; color: var(--madeira-clara); padding: 40px 0; }
+  .totais { border-top: 2px solid var(--madeira); padding-top: 12px; margin-top: 8px; }
+  .totais .linha { display: flex; justify-content: space-between; padding: 3px 0; }
+  .totais .total { font-size: 1.25rem; font-weight: 800; color: var(--vermelho); margin-bottom: 12px; }
+
+  /* ---------- Checkout ---------- */
+  #checkout { max-width: 560px; margin: 0 auto; padding: 24px 16px 60px; }
+  #checkout h2 { color: var(--vermelho-escuro); margin-bottom: 14px; }
+  .voltar { background: none; color: var(--madeira); font-weight: 700; margin-bottom: 14px; }
+  fieldset { border: 0; background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra); padding: 18px; margin-bottom: 16px; }
+  legend { font-weight: 800; color: var(--vermelho); padding: 0 6px; }
+  label.campo { display: block; font-weight: 600; margin-top: 10px; }
+  input[type="text"], input[type="tel"] {
+    width: 100%; padding: 12px; border: 2px solid #e3d5ca; border-radius: 10px; font: inherit; margin-top: 4px;
+  }
+  input[type="text"]:focus { border-color: var(--laranja); outline: 0; }
+  input.erro { border-color: var(--vermelho); background: #fdecea; }
+  .opcao-pagamento { display: flex; align-items: center; gap: 10px; padding: 10px 0; font-weight: 600; }
+  .msg-erro { color: var(--vermelho); font-weight: 600; margin: 8px 0; min-height: 1.2em; }
+  .resumo-checkout { background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra); padding: 18px; margin-bottom: 16px; }
+  .resumo-checkout .linha { display: flex; justify-content: space-between; padding: 2px 0; }
+  .btn-whats { background: #25d366; }
+  .btn-whats:hover { background: #1da851; }
+
+  footer { text-align: center; padding: 20px; color: var(--madeira-clara); font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TELA INICIAL
+     ============================================================ -->
+<div id="tela-inicial">
+  <button class="btn-carrinho" id="btn-carrinho" aria-label="Abrir carrinho">
+    🛒<span class="contador" id="contador">0</span>
+  </button>
+
+  <header class="hero">
+    <h1 id="nome-pizzaria"></h1>
+    <p id="slogan"></p>
+  </header>
+
+  <main>
+    <h2 class="titulo">🍕 Pizzas Salgadas</h2>
+    <section class="grid-pizzas" id="grid-salgadas"></section>
+
+    <h2 class="titulo">🍫 Pizzas Doces</h2>
+    <section class="grid-pizzas" id="grid-doces"></section>
+
+    <h2 class="titulo">🥤 Bebidas</h2>
+    <section class="grid-bebidas" id="grid-bebidas"></section>
+  </main>
+
+  <footer>Taxa de entrega fixa de <span id="rodape-taxa"></span></footer>
+</div>
+
+<!-- ============================================================
+     TELA DE CHECKOUT (começa oculta)
+     ============================================================ -->
+<div id="checkout" class="oculto">
+  <button class="voltar" id="btn-voltar">← Voltar ao cardápio</button>
+  <h2>Entrega e Pagamento</h2>
+
+  <div class="resumo-checkout" id="resumo-checkout"></div>
+
+  <form id="form-pedido" novalidate>
+    <fieldset>
+      <legend>📍 Endereço de entrega</legend>
+      <label class="campo">Rua *<input type="text" id="rua" autocomplete="street-address"></label>
+      <label class="campo">Número *<input type="text" id="numero" inputmode="numeric"></label>
+      <label class="campo">Bairro *<input type="text" id="bairro"></label>
+      <label class="campo">Complemento *<input type="text" id="complemento" placeholder="Apto, bloco, casa..."></label>
+      <label class="campo">Ponto de referência *<input type="text" id="referencia"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>💳 Forma de pagamento</legend>
+      <label class="opcao-pagamento"><input type="radio" name="pagamento" value="Cartão de Crédito"> Cartão de Crédito</label>
+      <label class="opcao-pagamento"><input type="radio" name="pagamento" value="Cartão de Débito"> Cartão de Débito</label>
+      <label class="opcao-pagamento"><input type="radio" name="pagamento" value="Dinheiro"> Dinheiro</label>
+      <div id="bloco-troco" class="oculto">
+        <label class="campo">Precisa de troco para quanto? *<input type="text" id="troco" inputmode="decimal" placeholder="Ex.: 100"></label>
+      </div>
+    </fieldset>
+
+    <p class="msg-erro" id="msg-erro" role="alert"></p>
+    <button type="submit" class="btn btn-whats grande">Enviar Pedido por WhatsApp</button>
+  </form>
+</div>
+
+<!-- ============================================================
+     MODAL: escolha de sabores / confirmação de bebida
+     ============================================================ -->
+<div class="fundo oculto" id="modal-produto">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <button class="fechar" data-fechar="modal-produto" aria-label="Fechar">×</button>
+    <h3 id="modal-titulo"></h3>
+    <div id="modal-lista"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: aviso de retenção
+     ============================================================ -->
+<div class="fundo oculto" id="modal-retencao">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ret-titulo">
+    <h3 id="ret-titulo">✅ Item adicionado!</h3>
+    <p id="ret-item" style="margin-bottom:6px"></p>
+    <p><strong>Deseja finalizar o pedido ou continuar comprando?</strong></p>
+    <div class="acoes">
+      <button class="btn secundario" id="btn-continuar">Continuar comprando</button>
+      <button class="btn" id="btn-finalizar">Finalizar pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SIDEBAR DO CARRINHO
+     ============================================================ -->
+<div class="sidebar-fundo oculto" id="sidebar-fundo"></div>
+<aside class="sidebar" id="sidebar" aria-label="Carrinho" aria-hidden="true">
+  <header>
+    <h3>🛒 Seu carrinho</h3>
+    <button id="btn-fechar-sidebar" aria-label="Fechar carrinho">×</button>
+  </header>
+  <div class="itens-carrinho" id="itens-carrinho"></div>
+  <div class="totais" id="totais-carrinho"></div>
+  <button class="btn grande" id="btn-avancar">Avançar para Pagamento e Entrega</button>
+</aside>
+
+<script>
+/* ============================================================
+   1) CONFIGURAÇÕES DA PIZZARIA  ← EDITE AQUI
+   ============================================================ */
+
+// >>> ALTERE AQUI O NÚMERO DO WHATSAPP <<<
+// Formato: código do país (55) + DDD + número, só dígitos. Ex.: 5511987654321
+const WHATSAPP_NUMERO = "5500000000000";
+
+const NOME_PIZZARIA = "Pizzaria Bella Massa";
+const SLOGAN = "Massa artesanal, forno a lenha e muito sabor na sua porta!";
+const TAXA_ENTREGA = 5.00;
+
+/* ============================================================
+   2) CARDÁPIO  ← EDITE AQUI (nomes e preços)
+   Para trocar um preço, mude o número "preco".
+   Para adicionar um sabor, copie uma linha { nome, preco } e cole.
+   ============================================================ */
+const CARDAPIO = {
+  pizzas: {
+    "Salgada P": [
+      { nome: "Calabresa",       preco: 32.00 },
+      { nome: "Mussarela",       preco: 30.00 },
+      { nome: "Frango c/ Catupiry", preco: 35.00 }
+    ],
+    "Salgada M": [
+      { nome: "Calabresa",       preco: 42.00 },
+      { nome: "Mussarela",       preco: 40.00 },
+      { nome: "Frango c/ Catupiry", preco: 46.00 }
+    ],
+    "Salgada G": [
+      { nome: "Calabresa",       preco: 52.00 },
+      { nome: "Mussarela",       preco: 50.00 },
+      { nome: "Frango c/ Catupiry", preco: 58.00 }
+    ],
+    "Doce P": [
+      { nome: "Chocolate",       preco: 30.00 },
+      { nome: "Banana c/ Canela", preco: 28.00 },
+      { nome: "Romeu e Julieta", preco: 32.00 }
+    ],
+    "Doce M": [
+      { nome: "Chocolate",       preco: 40.00 },
+      { nome: "Banana c/ Canela", preco: 38.00 },
+      { nome: "Romeu e Julieta", preco: 42.00 }
+    ],
+    "Doce G": [
+      { nome: "Chocolate",       preco: 50.00 },
+      { nome: "Banana c/ Canela", preco: 48.00 },
+      { nome: "Romeu e Julieta", preco: 52.00 }
+    ]
+  },
+  bebidas: [
+    { nome: "Coca-Cola", preco: 8.00, emoji: "🥤" },
+    { nome: "Guaraná",   preco: 7.00, emoji: "🧃" },
+    { nome: "Fanta Uva", preco: 7.00, emoji: "🍇" }
+  ]
+};
+
+/* ============================================================
+   3) ESTADO E UTILITÁRIOS
+   ============================================================ */
+let carrinho = [];   // [{ id, nome, tamanho, preco, qtd }]
+const $ = (id) => document.getElementById(id);
+const moeda = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const escapar = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const subtotal = () => carrinho.reduce((t, i) => t + i.preco * i.qtd, 0);
+const totalItens = () => carrinho.reduce((t, i) => t + i.qtd, 0);
+
+/* ============================================================
+   4) RENDERIZAÇÃO DA TELA INICIAL
+   ============================================================ */
+function montarTelaInicial() {
+  $("nome-pizzaria").textContent = "🍕 " + NOME_PIZZARIA;
+  $("slogan").textContent = SLOGAN;
+  $("rodape-taxa").textContent = moeda(TAXA_ENTREGA);
+  document.title = NOME_PIZZARIA + " – Delivery";
+
+  // 6 cards de pizza: 3 salgadas + 3 doces
+  const tamanhos = { P: "Pequena", M: "Média", G: "Grande" };
+  ["Salgada", "Doce"].forEach((tipo) => {
+    const grid = $(tipo === "Salgada" ? "grid-salgadas" : "grid-doces");
+    Object.keys(tamanhos).forEach((sigla) => {
+      const chave = `${tipo} ${sigla}`;
+      const card = document.createElement("button");
+      card.className = "card card-pizza " + (tipo === "Doce" ? "doce" : "");
+      card.innerHTML =
+        `<span class="emoji">${tipo === "Doce" ? "🍫" : "🍕"}</span>
+         <span class="tipo">${tipo}</span>
+         <span class="tamanho">Tamanho ${sigla}</span>
+         <span class="detalhe">${tamanhos[sigla]}</span>`;
+      card.addEventListener("click", () => abrirModalPizza(chave));
+      grid.appendChild(card);
+    });
+  });
+
+  // 3 cards de bebida
+  CARDAPIO.bebidas.forEach((b) => {
+    const card = document.createElement("button");
+    card.className = "card card-bebida";
+    card.innerHTML =
+      `<span class="emoji">${escapar(b.emoji)}</span>
+       <span class="nome">${escapar(b.nome)}</span>
+       <span class="preco">${moeda(b.preco)}</span>`;
+    card.addEventListener("click", () => abrirModalBebida(b));
+    $("grid-bebidas").appendChild(card);
+  });
+}
+
+/* ============================================================
+   5) MODAIS DE PRODUTO
+   ============================================================ */
+function abrirModal(id) { $(id).classList.remove("oculto"); }
+function fecharModal(id) { $(id).classList.add("oculto"); }
+
+function abrirModalPizza(chave) {
+  $("modal-titulo").textContent = "Pizza " + chave;
+  const lista = $("modal-lista");
+  lista.innerHTML = "";
+  CARDAPIO.pizzas[chave].forEach((sabor) => {
+    const linha = document.createElement("div");
+    linha.className = "sabor";
+    linha.innerHTML =
+      `<div class="info"><strong>${escapar(sabor.nome)}</strong><span>${moeda(sabor.preco)}</span></div>
+       <button class="btn">Adicionar ao Carrinho</button>`;
+    linha.querySelector("button").addEventListener("click", () => {
+      adicionarAoCarrinho({ nome: sabor.nome, tamanho: chave, preco: sabor.preco });
+      fecharModal("modal-produto");
+    });
+    lista.appendChild(linha);
+  });
+  abrirModal("modal-produto");
+}
+
+function abrirModalBebida(bebida) {
+  $("modal-titulo").textContent = bebida.nome;
+  const lista = $("modal-lista");
+  lista.innerHTML = "";
+  const linha = document.createElement("div");
+  linha.className = "sabor";
+  linha.innerHTML =
+    `<div class="info"><strong>${escapar(bebida.nome)}</strong><span>${moeda(bebida.preco)}</span></div>
+     <button class="btn">Adicionar ao Carrinho</button>`;
+  linha.querySelector("button").addEventListener("click", () => {
+    adicionarAoCarrinho({ nome: bebida.nome, tamanho: "Bebida", preco: bebida.preco });
+    fecharModal("modal-produto");
+  });
+  lista.appendChild(linha);
+  abrirModal("modal-produto");
+}
+
+/* ============================================================
+   6) CARRINHO
+   ============================================================ */
+function adicionarAoCarrinho(produto) {
+  const id = produto.tamanho + "|" + produto.nome;
+  const existente = carrinho.find((i) => i.id === id);
+  if (existente) existente.qtd += 1;
+  else carrinho.push({ id, ...produto, qtd: 1 });
+  atualizarCarrinho();
+
+  // Aviso de retenção
+  $("ret-item").textContent = `${produto.nome} (${produto.tamanho}) foi para o carrinho.`;
+  abrirModal("modal-retencao");
+}
+
+function alterarQtd(id, delta) {
+  const item = carrinho.find((i) => i.id === id);
+  if (!item) return;
+  item.qtd += delta;
+  if (item.qtd <= 0) carrinho = carrinho.filter((i) => i.id !== id);
+  atualizarCarrinho();
+}
+
+function atualizarCarrinho() {
+  $("contador").textContent = totalItens();
+  const lista = $("itens-carrinho");
+  lista.innerHTML = "";
+
+  if (carrinho.length === 0) {
+    lista.innerHTML = '<p class="vazio">Seu carrinho está vazio.</p>';
+  }
+
+  carrinho.forEach((i) => {
+    const el = document.createElement("div");
+    el.className = "item-carrinho";
+    el.innerHTML =
+      `<div class="linha">
+         <div><span class="nome">${escapar(i.nome)}</span><br><span class="tam">${escapar(i.tamanho)}</span></div>
+         <strong>${moeda(i.preco * i.qtd)}</strong>
+       </div>
+       <div class="qtd">
+         <button aria-label="Diminuir">−</button><span>${i.qtd}</span><button aria-label="Aumentar">+</button>
+       </div>`;
+    const [menos, mais] = el.querySelectorAll(".qtd button");
+    menos.addEventListener("click", () => alterarQtd(i.id, -1));
+    mais.addEventListener("click", () => alterarQtd(i.id, +1));
+    lista.appendChild(el);
+  });
+
+  const sub = subtotal();
+  const taxa = carrinho.length ? TAXA_ENTREGA : 0;
+  $("totais-carrinho").innerHTML =
+    `<div class="linha"><span>Subtotal</span><span>${moeda(sub)}</span></div>
+     <div class="linha"><span>Taxa de entrega</span><span>${moeda(taxa)}</span></div>
+     <div class="linha total"><span>Total a pagar</span><span>${moeda(sub + taxa)}</span></div>`;
+  $("btn-avancar").disabled = carrinho.length === 0;
+  $("btn-avancar").style.opacity = carrinho.length === 0 ? .5 : 1;
+}
+
+function abrirSidebar() {
+  $("sidebar").classList.add("aberta");
+  $("sidebar").setAttribute("aria-hidden", "false");
+  $("sidebar-fundo").classList.remove("oculto");
+}
+function fecharSidebar() {
+  $("sidebar").classList.remove("aberta");
+  $("sidebar").setAttribute("aria-hidden", "true");
+  $("sidebar-fundo").classList.add("oculto");
+}
+
+/* ============================================================
+   7) CHECKOUT
+   ============================================================ */
+function irParaCheckout() {
+  if (carrinho.length === 0) return;
+  fecharSidebar();
+  $("tela-inicial").classList.add("oculto");
+  $("checkout").classList.remove("oculto");
+
+  const linhas = carrinho.map((i) =>
+    `<div class="linha"><span>${i.qtd}x ${escapar(i.nome)} (${escapar(i.tamanho)})</span><span>${moeda(i.preco * i.qtd)}</span></div>`
+  ).join("");
+  $("resumo-checkout").innerHTML =
+    linhas +
+    `<hr style="margin:8px 0;border:0;border-top:1px solid #eee">
+     <div class="linha"><span>Subtotal</span><span>${moeda(subtotal())}</span></div>
+     <div class="linha"><span>Taxa de entrega</span><span>${moeda(TAXA_ENTREGA)}</span></div>
+     <div class="linha"><strong>Total</strong><strong>${moeda(subtotal() + TAXA_ENTREGA)}</strong></div>`;
+  window.scrollTo(0, 0);
+}
+
+function voltarAoCardapio() {
+  $("checkout").classList.add("oculto");
+  $("tela-inicial").classList.remove("oculto");
+  window.scrollTo(0, 0);
+}
+
+/* ============================================================
+   8) VALIDAÇÃO E ENVIO PARA O WHATSAPP
+   ============================================================ */
+const CAMPOS_ENDERECO = [
+  ["rua", "Rua"], ["numero", "Número"], ["bairro", "Bairro"],
+  ["complemento", "Complemento"], ["referencia", "Ponto de referência"]
+];
+
+function validarFormulario() {
+  let primeiroErro = null;
+  CAMPOS_ENDERECO.forEach(([id, rotulo]) => {
+    const campo = $(id);
+    const vazio = campo.value.trim() === "";
+    campo.classList.toggle("erro", vazio);
+    if (vazio && !primeiroErro) primeiroErro = `Preencha o campo "${rotulo}".`;
+  });
+
+  const pagamento = document.querySelector('input[name="pagamento"]:checked');
+  if (!pagamento && !primeiroErro) primeiroErro = "Escolha a forma de pagamento.";
+
+  if (pagamento && pagamento.value === "Dinheiro") {
+    const vazio = $("troco").value.trim() === "";
+    $("troco").classList.toggle("erro", vazio);
+    if (vazio && !primeiroErro) primeiroErro = "Informe para quanto precisa de troco (ou digite 0 se não precisa).";
+  }
+
+  $("msg-erro").textContent = primeiroErro || "";
+  return !primeiroErro;
+}
+
+function montarMensagem() {
+  const taxa = TAXA_ENTREGA;
+  const total = subtotal() + taxa;
+  const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
+  const v = (id) => $(id).value.trim();
+
+  const itens = carrinho.map((i) =>
+    `• ${i.qtd}x ${i.nome} (${i.tamanho}) - ${moeda(i.preco * i.qtd)}`
+  ).join("\n");
+
+  let texto =
+`*NOVO PEDIDO - ${NOME_PIZZARIA}*
+
+*Itens:*
+${itens}
+
+Subtotal: ${moeda(subtotal())}
+Taxa de entrega: ${moeda(taxa)}
+*Total: ${moeda(total)}*
+
+*Endereço de entrega:*
+${v("rua")}, ${v("numero")}
+Bairro: ${v("bairro")}
+Complemento: ${v("complemento")}
+Referência: ${v("referencia")}
+
+*Pagamento:* ${pagamento}`;
+
+  if (pagamento === "Dinheiro") texto += `\nTroco para: ${v("troco")}`;
+  return texto;
+}
+
+function enviarPedido(evento) {
+  evento.preventDefault();
+  if (carrinho.length === 0) { $("msg-erro").textContent = "Seu carrinho está vazio."; return; }
+  if (!validarFormulario()) return;
+
+  const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(montarMensagem())}`;
+  window.open(url, "_blank", "noopener");
+}
+
+/* ============================================================
+   9) EVENTOS
+   ============================================================ */
+$("btn-carrinho").addEventListener("click", abrirSidebar);
+$("btn-fechar-sidebar").addEventListener("click", fecharSidebar);
+$("sidebar-fundo").addEventListener("click", fecharSidebar);
+$("btn-avancar").addEventListener("click", irParaCheckout);
+$("btn-voltar").addEventListener("click", voltarAoCardapio);
+$("form-pedido").addEventListener("submit", enviarPedido);
+
+$("btn-continuar").addEventListener("click", () => fecharModal("modal-retencao"));
+$("btn-finalizar").addEventListener("click", () => { fecharModal("modal-retencao"); abrirSidebar(); });
+
+document.querySelectorAll("[data-fechar]").forEach((b) =>
+  b.addEventListener("click", () => fecharModal(b.dataset.fechar)));
+document.querySelectorAll(".fundo").forEach((f) =>
+  f.addEventListener("click", (e) => { if (e.target === f && f.id === "modal-produto") fecharModal(f.id); }));
+
+// Mostra o campo de troco só quando "Dinheiro" está marcado
+document.querySelectorAll('input[name="pagamento"]').forEach((r) =>
+  r.addEventListener("change", () => {
+    $("bloco-troco").classList.toggle("oculto", r.value !== "Dinheiro" || !r.checked);
+  }));
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { fecharModal("modal-produto"); fecharSidebar(); }
+});
+
+/* ============================================================
+   10) INICIALIZAÇÃO
+   ============================================================ */
+montarTelaInicial();
+atualizarCarrinho();
+</script>
+</body>
+</html>
